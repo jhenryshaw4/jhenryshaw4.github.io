@@ -12,10 +12,13 @@
 }
 
 .self {
-    padding-top: 15px;
+    padding-top: 12px;
+    height: auto;
+    width: 100%;
+    
 }
 .topnav a {
-    font: menu;
+    font:status-bar;
     font-size: 25px;
     color: darkgray;
     text-decoration: none;
