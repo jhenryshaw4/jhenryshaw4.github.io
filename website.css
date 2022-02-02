@@ -1,15 +1,33 @@
 
-.topnav {
-    font-size: medium;    
-    background-color: rgb(87, 87, 87);
+.topnav {  
+    background-color: rgb(49, 49, 49);
     height: 50px;
     margin: 0px;
     margin-top: 0px;
     margin-left: 0px;
     margin-right: 0px;
     margin-bottom: 0px;
+    word-spacing: 20px;
+    position: relative;
 }
 
+.self {
+    padding-top: 15px;
+}
+.topnav a {
+    font: menu;
+    font-size: 25px;
+    color: darkgray;
+    text-decoration: none;
+    text-align: center;
+    float: left;
+    padding-left: 15px;
+    padding-top: 9px;
+}
+.body {
+    margin: 0px;
+    padding: 0px;
+}
 img {
     height: 200px;
     width: auto;
