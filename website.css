@@ -1,16 +1,4 @@
 
-.topnav {  
-    background-color: rgb(49, 49, 49);
-    height: 50px;
-    margin: 0px;
-    margin-top: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-bottom: 0px;
-    word-spacing: 20px;
-    position: relative;
-}
-
 .homeright {
     font-style: normal;
     color: rgb(49, 49, 49);
@@ -21,7 +9,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 13px;
-    padding-top: 12px;
+    padding-top: 10px;
 }
 .self {
     padding-top: 0px;
