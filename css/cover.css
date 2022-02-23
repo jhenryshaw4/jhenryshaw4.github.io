@@ -96,7 +96,7 @@ body {
 }
 
 .home {
-    background: url('IMG_0698.jpg');
+    background: url('../IMG_0698.jpg');
     background-repeat: no-repeat;
     background-position: center center;
     -webkit-background-size: cover;
