@@ -115,6 +115,10 @@ body {
     max-width: 42em;
 }
 
+.goDown {
+    padding-top: 20px;
+}
+
 
 /*
  * Header
