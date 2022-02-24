@@ -1,0 +1,31 @@
+.mx-project {
+    position: absolute;
+}
+
+.project {
+    position:absolute
+}
+
+.goDown {
+    padding-top: 400px;
+    padding-left: 20px;
+}
+
+.home-words {
+    background-color: rgb(143, 143, 143);
+    border-radius: 20px;
+}
+
+.home-hi {
+    /* color: rgb(227, 222, 222); */
+}
+
+.project-container {
+    position:absolute;
+    padding-right: 40px;
+}
+
+.project-navbar {
+    padding-bottom: 40px;
+}
+
