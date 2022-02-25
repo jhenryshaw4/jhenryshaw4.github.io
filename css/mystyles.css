@@ -23,9 +23,29 @@
 .project-container {
     position:absolute;
     padding-right: 40px;
+    padding-top: 100px;
+    height: 75%;
 }
 
 .project-navbar {
     padding-bottom: 40px;
 }
 
+.h-35 {
+    height:35%;
+}
+
+.project-text {
+    color: rgb(38, 38, 38);
+}
+
+.map-background {
+    background: url('../projects/map.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    
+}
