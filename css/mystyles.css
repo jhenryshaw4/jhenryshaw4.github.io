@@ -53,3 +53,33 @@
 .contact-buttons {
     padding-bottom: 500px;
 }
+
+.coursework-footer {
+    background-color: lightgray;
+}
+
+.stay {
+    position: sticky;
+    width: 100%;
+}
+
+.footer {
+    padding:30px;
+    position: fixed;
+    bottom: 0px;
+}
+
+.copy {
+    padding-bottom: 50px;
+    left: 50%;
+    right: 50%;
+}
+
+.h-10 {
+    height: 8%;
+    
+}
+
+.white {
+    background-color: white;
+}
