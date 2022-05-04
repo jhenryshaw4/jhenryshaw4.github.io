@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            left: 0;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        //var bbox = turf.bbox(features);
+        //token
+        mapboxgl.accessToken = "pk.eyJ1IjoianNoYXc0IiwiYSI6ImNremZuZzE0YjBneXUycG16bnRnaXNhdWUifQ.ExFrziqguny5pxYqwMae_Q";
+
+
+        //map
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [-71.092212, 42.35619],
+            zoom: 14
+        });
+
+        async function routeData() {
+            var url = 'https://api-v3.mbta.com/vehicles?filter%5Broute%5D=1&include=trip';
+            var res = await fetch(url);
+            var data = await res.json();
+            return data;
+        }
+
+        function perc2color(perc) {
+            var r, g, b = 0;
+            if (perc < 50) {
+                r = 255;
+                g = Math.round(5.1 * perc);
+            } else {
+                g = 255;
+                r = Math.round(510 - 5.10 * perc);
+            }
+            var h = r * 0x10000 + g * 0x100 + b * 0x1;
+            return '#' + ('000000' + h.toString(16)).slice(-6);
+        }
+
+        console.log(perc2color(90))
+
+        buses = [];
+        oldbuses = [];
+
+        //list of coords of points on route
+        var apipoints = [
+            [-71.11817,
+                42.37318
+            ],
+            [-71.11846,
+                42.37327
+            ],
+            [-71.11858,
+                42.37335
+            ],
+            [-71.11876,
+                42.37324
+            ],
+            [-71.11888,
+                42.373
+            ],
+            [-71.11911,
+                42.37258
+            ],
+            [-71.11935,
+                42.37224
+            ],
+            [-71.11901,
+                42.37211
+            ],
+            [-71.11861,
+                42.37196
+            ],
+            [-71.11841,
+                42.37189
+            ],
+            [-71.11786,
+                42.37169
+            ],
+            [-71.11741,
+                42.37152
+            ],
+            [-71.11706,
+                42.3714
+            ],
+            [-71.1161,
+                42.37107
+            ],
+            [-71.11592,
+                42.37101
+            ],
+            [-71.11592,
+                42.37101
+            ],
+            [-71.11518,
+                42.37074
+            ],
+            [-71.11448,
+                42.37048
+            ],
+            [-71.11424,
+                42.37039
+            ],
+            [-71.11346,
+                42.37012
+            ],
+            [-71.11346,
+                42.37012
+            ],
+            [-71.11335,
+                42.37008
+            ],
+            [-71.11261,
+                42.36982
+            ],
+            [-71.11186,
+                42.36956
+            ],
+            [-71.11074,
+                42.36916
+            ],
+            [-71.11038,
+                42.36903
+            ],
+            [-71.11038,
+                42.36903
+            ],
+            [-71.11027,
+                42.36899
+            ],
+            [-71.10957,
+                42.36872
+            ],
+            [-71.10888,
+                42.36841
+            ],
+            [-71.10888,
+                42.36841
+            ],
+            [-71.10878,
+                42.36837
+            ],
+            [-71.10816,
+                42.36807
+            ],
+            [-71.10806,
+                42.36803
+            ],
+            [-71.10772,
+                42.36784
+            ],
+            [-71.10766,
+                42.36782
+            ],
+            [-71.10734,
+                42.36761
+            ],
+            [-71.10702,
+                42.36741
+            ],
+            [-71.10668,
+                42.3672
+            ],
+            [-71.10635,
+                42.36697
+            ],
+            [-71.10585,
+                42.36667
+            ],
+            [-71.10585,
+                42.36667
+            ],
+            [-71.1057,
+                42.36658
+            ],
+            [-71.10541,
+                42.3664
+            ],
+            [-71.1047,
+                42.36597
+            ],
+            [-71.10405,
+                42.3656
+            ],
+            [-71.10395,
+                42.36555
+            ],
+            [-71.10374,
+                42.3654
+            ],
+            [-71.10318,
+                42.36506
+            ],
+            [-71.10302,
+                42.36496
+            ],
+            [-71.10302,
+                42.36496
+            ],
+            [-71.10258,
+                42.3647
+            ],
+            [-71.1021,
+                42.36441
+            ],
+            [-71.10139,
+                42.36399
+            ],
+            [-71.10119,
+                42.36388
+            ],
+            [-71.10089,
+                42.36371
+            ],
+            [-71.10051,
+                42.36351
+            ],
+            [-71.09996,
+                42.36318
+            ],
+            [-71.09959,
+                42.36297
+            ],
+            [-71.09943,
+                42.36287
+            ],
+            [-71.09943,
+                42.36287
+            ],
+            [-71.0994,
+                42.36285
+            ],
+            [-71.09905,
+                42.36264
+            ],
+            [-71.09796,
+                42.36197
+            ],
+            [-71.0976,
+                42.36174
+            ],
+            [-71.09695,
+                42.36137
+            ],
+            [-71.09653,
+                42.36113
+            ],
+            [-71.096,
+                42.36082
+            ],
+            [-71.09594,
+                42.36078
+            ],
+            [-71.09594,
+                42.36078
+            ],
+            [-71.09524,
+                42.36039
+            ],
+            [-71.09485,
+                42.36015
+            ],
+            [-71.09431,
+                42.35976
+            ],
+            [-71.09411,
+                42.3596
+            ],
+            [-71.09383,
+                42.35933
+            ],
+            [-71.09371,
+                42.3592
+            ],
+            [-71.09354,
+                42.35898
+            ],
+            [-71.09348,
+                42.35888
+            ],
+            [-71.0934,
+                42.35875
+            ],
+            [-71.0934,
+                42.35875
+            ],
+            [-71.09338,
+                42.35872
+            ],
+            [-71.09323,
+                42.35845
+            ],
+            [-71.09309,
+                42.35818
+            ],
+            [-71.09281,
+                42.35761
+            ],
+            [-71.09264,
+                42.35727
+            ],
+            [-71.09252,
+                42.35701
+            ],
+            [-71.0912,
+                42.35433
+            ],
+            [-71.08994,
+                42.35177
+            ],
+            [-71.0895,
+                42.35083
+            ],
+            [-71.08933,
+                42.3505
+            ],
+            [-71.08929,
+                42.35044
+            ],
+            [-71.0891,
+                42.35005
+            ],
+            [-71.08906,
+                42.34997
+            ],
+            [-71.08906,
+                42.34997
+            ],
+            [-71.08893,
+                42.34969
+            ],
+            [-71.0887,
+                42.34925
+            ],
+            [-71.08853,
+                42.34888
+            ],
+            [-71.08852,
+                42.34885
+            ],
+            [-71.08832,
+                42.34846
+            ],
+            [-71.08814,
+                42.34811
+            ],
+            [-71.08807,
+                42.34796
+            ],
+            [-71.08807,
+                42.34796
+            ],
+            [-71.08776,
+                42.34729
+            ],
+            [-71.08755,
+                42.3469
+            ],
+            [-71.08743,
+                42.34663
+            ],
+            [-71.08735,
+                42.34647
+            ],
+            [-71.08707,
+                42.34591
+            ],
+            [-71.08684,
+                42.34544
+            ],
+            [-71.0866,
+                42.34494
+            ],
+            [-71.08655,
+                42.34485
+            ],
+            [-71.08634,
+                42.3444
+            ],
+            [-71.08634,
+                42.3444
+            ],
+            [-71.08591,
+                42.34347
+            ],
+            [-71.08585,
+                42.34337
+            ],
+            [-71.0858,
+                42.34332
+            ],
+            [-71.08505,
+                42.34281
+            ],
+            [-71.08485,
+                42.34269
+            ],
+            [-71.08463,
+                42.34254
+            ],
+            [-71.08463,
+                42.34254
+            ],
+            [-71.0841,
+                42.34218
+            ],
+            [-71.08326,
+                42.34161
+            ],
+            [-71.08326,
+                42.34161
+            ],
+            [-71.08326,
+                42.34161
+            ],
+            [-71.08317,
+                42.34156
+            ],
+            [-71.08303,
+                42.34146
+            ],
+            [-71.08203,
+                42.3408
+            ],
+            [-71.08175,
+                42.34064
+            ],
+            [-71.08095,
+                42.3398
+            ],
+            [-71.08041,
+                42.33928
+            ],
+            [-71.0803,
+                42.33916
+            ],
+            [-71.08024,
+                42.33911
+            ],
+            [-71.08024,
+                42.33911
+            ],
+            [-71.07981,
+                42.33873
+            ],
+            [-71.07965,
+                42.33859
+            ],
+            [-71.07882,
+                42.3379
+            ],
+            [-71.07869,
+                42.3378
+            ],
+            [-71.07799,
+                42.33725
+            ],
+            [-71.07765,
+                42.33697
+            ],
+            [-71.07702,
+                42.33646
+            ],
+            [-71.07688,
+                42.33634
+            ],
+            [-71.07688,
+                42.33634
+            ],
+            [-71.07655,
+                42.33605
+            ],
+            [-71.07517,
+                42.33493
+            ],
+            [-71.07503,
+                42.3348
+            ],
+            [-71.07503,
+                42.3348
+            ],
+            [-71.07362,
+                42.33358
+            ],
+            [-71.07362,
+                42.33358
+            ],
+            [-71.07351,
+                42.3335
+            ],
+            [-71.07391,
+                42.33321
+            ],
+            [-71.07436,
+                42.33283
+            ],
+            [-71.07478,
+                42.33252
+            ],
+            [-71.07515,
+                42.33228
+            ],
+            [-71.07566,
+                42.33198
+            ],
+            [-71.07617,
+                42.33169
+            ],
+            [-71.07628,
+                42.33162
+            ],
+            [-71.07628,
+                42.33162
+            ],
+            [-71.07688,
+                42.33124
+            ],
+            [-71.07732,
+                42.33136
+            ],
+            [-71.0782,
+                42.33165
+            ],
+            [-71.07847,
+                42.33174
+            ],
+            [-71.07909,
+                42.33199
+            ],
+            [-71.07918,
+                42.33202
+            ],
+            [-71.07918,
+                42.33202
+            ],
+            [-71.07931,
+                42.33208
+            ],
+            [-71.07951,
+                42.33217
+            ],
+            [-71.08035,
+                42.33257
+            ],
+            [-71.08096,
+                42.3329
+            ],
+            [-71.08108,
+                42.33297
+            ],
+            [-71.08113,
+                42.3329
+            ],
+            [-71.08119,
+                42.33277
+            ],
+            [-71.08127,
+                42.33254
+            ],
+            [-71.08141,
+                42.33227
+            ],
+            [-71.08166,
+                42.33201
+            ],
+            [-71.08166,
+                42.33201
+            ],
+            [-71.08172,
+                42.33194
+            ],
+            [-71.08193,
+                42.33175
+            ],
+            [-71.08237,
+                42.33137
+            ],
+            [-71.08272,
+                42.33106
+            ],
+            [-71.0828,
+                42.33099
+            ],
+            [-71.0828,
+                42.33099
+            ],
+            [-71.08299,
+                42.33082
+            ],
+            [-71.0832,
+                42.33067
+            ],
+            [-71.08334,
+                42.33059
+            ],
+            [-71.08372,
+                42.33046
+            ],
+            [-71.08405,
+                42.3303
+            ],
+            [-71.08422,
+                42.33017
+            ],
+            [-71.08432,
+                42.33006
+            ],
+            [-71.08445,
+                42.32991
+            ],
+            [-71.08388,
+                42.32985
+            ]
+        ];
+        var pointsdict = [];
+
+        //function fixpoints() {
+        for (var counter = 0; counter < apipoints.length; counter++) {
+            pointsdict[counter] = {
+                'lng': apipoints[counter][0],
+                'lat': apipoints[counter][1],
+                'speeds': []
+            };
+        }
+
+
+        async function setup() {
+            const data = await routeData();
+            var length = data.data.length;
+            for (var counter = 0; counter < length; counter++) {
+                var lng = data.data[counter].attributes.longitude;
+                var lat = data.data[counter].attributes.latitude;
+                var id = data.data[counter].id;
+                if (data.data[counter].attributes.direction_id == 1) {
+                    buses.push({
+                        'lng': lng,
+                        'lat': lat,
+                        'id': id
+                    });
+                }
+            }
+            map.on('load', () => {
+                for (var counter = 1; counter < pointsdict.length; counter++) {
+                    map.addSource(counter.toString(), {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': [
+                                    [pointsdict[counter - 1].lng, pointsdict[counter - 1].lat],
+                                    [pointsdict[counter].lng, pointsdict[counter].lat]
+                                ]
+                            }
+                        }
+                    });
+                    map.addLayer({
+                        'id': counter.toString(),
+                        'type': 'line',
+                        'source': counter.toString(),
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#888',
+                            'line-width': 8
+                        }
+                    });
+                }
+            });
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            var R = 6371; // km
+            var dLat = toRad(lat2 - lat1);
+            var dLon = toRad(lon2 - lon1);
+            var lat1 = toRad(lat1);
+            var lat2 = toRad(lat2);
+
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            d = d * 1.60934;
+            return d;
+        }
+
+        // Converts numeric degrees to radians
+        function toRad(Value) {
+            return Value * Math.PI / 180;
+        }
+
+        var updating = async function speed() {
+            for (var counter = 0; counter < buses.length; counter++) {
+                oldbuses[counter] = buses[counter];
+            }
+            const data = await routeData();
+            var length = data.data.length;
+            for (var counter = 0; counter < length; counter++) {
+                var lng = data.data[counter].attributes.longitude;
+                var lat = data.data[counter].attributes.latitude;
+                var id = data.data[counter].id;
+                buses[counter] = {
+                    'lng': lng,
+                    'lat': lat,
+                    'id': id,
+                    'direction': data.data[counter].attributes.direction_id
+                }
+            }
+            for (var i = 0; i < buses.length; i++) {
+                for (var n = 0; n < oldbuses.length; n++) {
+                    if (buses[i].id == oldbuses[n].id) {
+                        if (buses[i].direction == 1) {
+                            if (buses[i].lng != oldbuses[n].lng) {
+                                //distance given bus moved
+                                var distance = getDistance(buses[i].lat, buses[i].lng, oldbuses[n].lat, oldbuses[n].lng);
+                                //now to find closest point on LineString
+                                var min = getDistance(buses[i].lat, buses[i].lng, pointsdict[0].lat, pointsdict[0].lng);
+                                var pointnum = 0;
+                                for (var j = 1; j < pointsdict.length; j++) {
+                                    if (getDistance(buses[i].lat, buses[i].lng, pointsdict[j].lat, pointsdict[j].lng) < min) {
+                                        min = getDistance(buses[i].lat, buses[i].lng, pointsdict[j].lat, pointsdict[j].lng);
+                                        pointnum = j;
+                                    }
+                                }
+                                var mph = distance / .00138889 * 2;
+                                console.log(mph);
+                                pointsdict[pointnum].speeds.push(mph);
+                            }
+                        }
+                    }
+                }
+            }
+            // for (var j = 0; j < pointsdict.length; j++) {
+            //     if (pointsdict[j].speeds.length > 0) {
+            //         var marker = new mapboxgl.Marker()
+            //             .setLngLat([pointsdict[j].lng, pointsdict[j].lat])
+            //             .addTo(map)
+            //     }
+            // }
+            //console.log(Math.sin(2 * pi))
+
+            var max = 20;
+            for (var counter = 1; counter < pointsdict.length; counter++) {
+                if (pointsdict[counter].speeds.length > 0) {
+                    map.removeLayer(counter.toString());
+                    map.removeSource(counter.toString());
+                    var total = 0;
+                    var nums = 0;
+                    for (var n = 0; n < pointsdict[counter].speeds.length; n++) {
+                        if (pointsdict[counter].speeds[n] < 60) {
+                            total = total + pointsdict[counter].speeds[n];
+                            nums = nums + 1;
+                        }
+                    }
+                    if (nums != 0) {
+                        var avg_speed = total / nums
+                        map.addSource(counter.toString(), {
+                            'type': 'geojson',
+                            'data': {
+                                'type': 'Feature',
+                                'properties': {},
+                                'geometry': {
+                                    'type': 'LineString',
+                                    'coordinates': [
+                                        [pointsdict[counter - 1].lng, pointsdict[counter - 1].lat],
+                                        [pointsdict[counter].lng, pointsdict[counter].lat]
+                                    ]
+                                }
+                            }
+                        });
+                        map.addLayer({
+                            'id': counter.toString(),
+                            'type': 'line',
+                            'source': counter.toString(),
+                            'layout': {
+                                'line-join': 'round',
+                                'line-cap': 'round'
+                            },
+                            'paint': {
+                                'line-color': perc2color((avg_speed / max) * 150),
+                                'line-width': 8
+                            }
+                        });
+                    }
+                }
+            }
+
+            var delay = 10000;
+            update();
+        }
+
+        function update() {
+            setTimeout(updating, 5000)
+        }
+
+        //fixpoints();
+        setup();
+        update();
+    </script>
+</body>
+
+</html>
